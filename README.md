@@ -4,7 +4,13 @@
 
 ## 正式使用：與 Block practice 相同的 QR 流程
 
-網站：https://ycmc-last-moon-c5.web.app/
+遊戲入口：https://angusma0711.github.io/ycmc-last-moon-c5/
+
+Firebase Hosting 備用入口：https://ycmc-last-moon-c5.web.app/
+
+GitHub Pages 與 Firebase Hosting 使用同一個 Firebase backend。請在同一入口完成 QR 配對；不同網站的教師登入與 localStorage 各自獨立。
+
+推送到 `main` 後，GitHub Actions 會先執行規則測試，再只發布 `eboard/` 到 GitHub Pages。QR 和公開畫面網址會自動保留 repository 子路徑。
 
 1. 在電腦／e-board 開啟網站，選 8–11 人，按「建立遊戲課堂」。
 2. 用私人 iPad 相機掃描大 QR code，開啟教師控制器，確認這是私人裝置。
