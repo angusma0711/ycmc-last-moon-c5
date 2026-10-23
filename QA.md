@@ -100,3 +100,10 @@ Firebase CLI 已確認 Rules 語法有效，成功 release Rules 及 Hosting。
 - Startup uses two columns on desktop and one column at tablet/mobile widths. QR keeps a solid white background.
 - Visually checked startup and teacher flow at tablet-width preview; 19 rule tests pass.
 - Pairing IDs, Firebase logic, private data and game engine unchanged; CSS/pairing asset versions and service-worker cache bumped.
+
+## Simplified public board（2026-10-23）
+
+- Night: only full-width arena, phase and timer; records and rules trigger hidden.
+- Day/setup: no Evidence panel; records below arena in normal scrolling flow, with no nested log scroll.
+- Roles/rules collapsed by default in a right-side drawer.
+- Verified local teacher → public preview night → published dawn transition; day record appears only after confirmation. 19 engine tests pass.
