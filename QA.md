@@ -84,3 +84,12 @@ Firebase CLI 已確認 Rules 語法有效，成功 release Rules 及 Hosting。
 - Codex 內置瀏覽器的匿名登入仍可能 auth/network-request-failed；Safari／Chrome 實際建立 pairing 均成功。
 
 - QR 控制器重新載入後，再次確認私人裝置，恢復同一課堂 B1A3F7 及原主持房間，顯示「已同步至大屏」。原本的 Question 提示保留，測試後切回 Evidence，仍未開始第一夜。
+
+## GitHub Pages（2026-10-23）
+
+- 正式入口：https://angusma0711.github.io/ycmc-last-moon-c5/
+- Actions 首次部署成功；19 項規則測試通過。
+- Chrome 從 Pages 建立 Firebase QR 課堂；控制連結保留 repository 子路徑。
+- Safari 獨立瀏覽器開啟 QR 對應連結，成功取得教師房間；Chrome 顯示已配對。
+- Pages 公開大屏收到 Safari 的 Question 提示更新，顯示「大屏已同步」。
+- 本次以獨立瀏覽器驗證配對；實體 iPad 相機掃碼仍待課前驗收。
