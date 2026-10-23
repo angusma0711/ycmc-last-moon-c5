@@ -8,7 +8,7 @@ const root=document.createElement('main');root.id='sessionStart';root.className=
 document.body.appendChild(root);
 const random=()=>Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x.toString(16).padStart(2,'0')).join('');
 const valid=x=>/^[a-f0-9]{32}$/.test(x||'');
-const title='<p class="session-eyebrow">最後的月夜 · C5</p><h1>走到學生身邊，<br>掌握遊戲節奏。</h1><p>電腦顯示遊戲，iPad 遙控。秘密身份留在教師裝置。</p>';
+const title='<div class="session-intro"><p class="session-eyebrow">THE LAST MOON · C5</p><h1>最後的月夜</h1><p class="session-tagline">月光之下，誰的話值得相信？</p><p>聆聽線索、提出疑問，以理由守護村莊。</p><div class="session-steps"><span>01 電腦建課堂</span><span>02 iPad 掃 QR</span><span>03 開啟遊戲大屏</span></div></div>';
 let ticket=null,transport=null,stopTicket=null,currentPublic='';
 function starter(){document.body.classList.remove('teacher-view');document.body.classList.add('start-view');root.hidden=false;$('#board').hidden=true;$('#teacher').hidden=true;}
 function decorateTeacher(){const heading=document.querySelector('.teacherhead h1');if(heading)heading.textContent='教師控制器';const caption=document.querySelector('.teacherhead small');if(caption)caption.textContent='課堂 '+(params.get('pair')?params.get('pair').slice(0,6).toUpperCase():'本機')+' · C5';const warning=document.querySelector('#teacher > p.warning');if(warning){const details=document.createElement('details');details.className='privacy-note';const summary=document.createElement('summary');summary.textContent='只有導師可看 · 私隱提示';details.appendChild(summary);warning.replaceWith(details);details.appendChild(warning);}}

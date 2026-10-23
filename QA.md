@@ -93,3 +93,10 @@ Firebase CLI 已確認 Rules 語法有效，成功 release Rules 及 Hosting。
 - Safari 獨立瀏覽器開啟 QR 對應連結，成功取得教師房間；Chrome 顯示已配對。
 - Pages 公開大屏收到 Safari 的 Question 提示更新，顯示「大屏已同步」。
 - 本次以獨立瀏覽器驗證配對；實體 iPad 相機掃碼仍待課前驗收。
+
+## Moonlit visual refresh（2026-10-23）
+
+- New generated background; indigo/lavender/gold palette across startup, teacher controls and public board.
+- Startup uses two columns on desktop and one column at tablet/mobile widths. QR keeps a solid white background.
+- Visually checked startup and teacher flow at tablet-width preview; 19 rule tests pass.
+- Pairing IDs, Firebase logic, private data and game engine unchanged; CSS/pairing asset versions and service-worker cache bumped.
