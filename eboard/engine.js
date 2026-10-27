@@ -1,31 +1,37 @@
 (function(root){
 'use strict';
-const ROLES=[['wolf','主狼人','第二夜起每晚襲擊一名其他活躍玩家。'],['helper','狼族助手','與主狼人互認；協助狼方討論。'],['doctor','醫生','每夜保護一人，可自保，不可連夜保護同人。'],['mayor','村長','全場一次秘密雙倍票。'],['messenger','傳令官','全場一次，向兩人問同一條問題。'],['archivist','檔案官','開局得知三位其他玩家，恰一位屬狼方。'],['watcher','守望者','開局得知左右固定座位是否相同陣營。'],['smith','鐵匠','全場一次，使一名活躍玩家當日不可被投。'],['historian','史官','開局得知另一名好人。'],['speaker','議事官','全場一次延長公開討論 60 秒（未平衡測試）。'],['witness','證詞官','全場一次請一人回答最相信誰及原因（未平衡測試）。']];
-const clone=x=>JSON.parse(JSON.stringify(x));
-function need(ok,msg){if(!ok)throw Error(msg)}
-function create(n=8){need([8,9,10,11].includes(+n),'只支援 8–11 人');return {n:+n,round:1,phase:'setup',players:Array.from({length:+n},(_,i)=>({id:i+1,role:ROLES[i][0],alive:true,ghostUsed:false,ghostRound:0})),used:{},lastProtect:0,shield:0,double:false,ballot:null,pending:null,history:[],voteRecords:[],winner:null,guide:'Evidence',timer:{remaining:180,endAt:null},intel:null};}
-const evil=p=>['wolf','helper'].includes(p.role);
-function player(s,id){const p=s.players.find(p=>p.id===+id);need(p,'玩家不存在');return p}
-function active(s,id){const p=player(s,id);need(p.alive,'只能選活躍玩家');return p}
-function seat(s,role){return s.players.find(p=>p.role===role)}
-function roleName(role){return ROLES.find(r=>r[0]===role)?.[1]||role}
-function assign(s,roles){need(s.phase==='setup','開局後不能改身份');need(roles.length===s.n&&new Set(roles).size===s.n&&ROLES.slice(0,s.n).every(r=>roles.includes(r[0])),'角色必須各一位');s.players.forEach((p,i)=>p.role=roles[i]);s.intel=null;}
-function shuffle(s,rng=Math.random){const a=s.players.map(p=>p.role);for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}assign(s,a)}
-function intel(s,rng=Math.random){const a=seat(s,'archivist');const bad=s.players.filter(p=>evil(p)&&p.id!==a.id);const good=s.players.filter(p=>!evil(p)&&p.id!==a.id);const pick=arr=>arr[Math.floor(rng()*arr.length)];const g1=pick(good),g2=pick(good.filter(p=>p.id!==g1.id));const watcher=seat(s,'watcher'),left=player(s,watcher.id===1?s.n:watcher.id-1),right=player(s,watcher.id===s.n?1:watcher.id+1);const h=seat(s,'historian');s.intel={archivist:[pick(bad).id,g1.id,g2.id].sort((a,b)=>a-b),watcher:evil(left)===evil(right)?'相同陣營':'不同陣營',historian:h?pick(s.players.filter(p=>!evil(p)&&p.id!==h.id)).id:null};return s.intel;}
-function start(s){need(s.phase==='setup','已開局');assign(s,s.players.map(p=>p.role));if(!s.intel)intel(s);s.phase='night';}
-function kill(s,id,night){const p=active(s,id);p.alive=false;p.ghostRound=s.round+(night?0:1)}
-function night(s,protect,attack){need(s.phase==='night'&&!s.pending,'現在不能結算夜晚');const doc=seat(s,'doctor');if(doc.alive){active(s,protect);need(+protect!==s.lastProtect,'醫生不可連夜保護同人')}else need(!+protect,'醫生已成幽靈，不能保護');if(s.round===1)need(!+attack,'第一夜禁止夜襲');else {active(s,attack);need(+attack!==seat(s,'wolf').id,'主狼人不可襲擊自己')}
-s.pending={kind:'night',protect:+protect,attack:+attack,blocked:s.round>1&&+protect===+attack};}
-function publishNight(s){const p=s.pending;need(p?.kind==='night','沒有待公開的夜晚結果');if(s.round>1&&!p.blocked)kill(s,p.attack,true);if(seat(s,'doctor').alive||p.protect)s.lastProtect=p.protect;s.history.push({round:s.round,type:'夜晚',text:s.round===1?'第一夜：互認與派發情報，沒有夜襲。':p.blocked?'醫生成功阻止夜襲。':`${p.attack} 號成為幽靈。`});s.pending=null;s.phase='private';s.timer={remaining:60,endAt:null};}
-function phase(s,next){const flow={private:'discussion',discussion:'skills',skills:'vote'};need(flow[s.phase]===next,'請依白天流程操作');s.phase=next;if(next==='discussion')s.timer={remaining:s.n>=10?240:180,endAt:null};}
-function skill(s,role,targets=[]){need(['discussion','skills','vote'].includes(s.phase)&&!s.pending&&!s.ballot,'目前不能使用技能');const p=seat(s,role);need(p&&p.alive,'該角色不在場或已成幽靈');need(!s.used[role],'技能已使用');need(['mayor','messenger','smith','speaker','witness'].includes(role),'沒有此一次性技能');if(role==='mayor'){need(s.phase==='vote','雙倍票請在投票階段使用');s.double=true;}if(role==='smith'){active(s,targets[0]);s.shield=+targets[0];}if(role==='messenger'){need(targets.length===2&&+targets[0]!==+targets[1],'請選兩位不同玩家');targets.forEach(id=>active(s,id));}if(role==='witness')active(s,targets[0]);if(role==='speaker'){need(s.phase==='discussion','延長技能只在公開討論使用');s.timer.remaining+=60;if(s.timer.endAt)s.timer.endAt+=60000;}s.used[role]=true;if(role!=='mayor')s.history.push({round:s.round,type:'技能',text:role==='smith'?`${targets[0]} 號今日不可被投。`:role==='speaker'?'公開討論延長 60 秒。':role==='messenger'?`請 ${targets.join('、')} 號回答同一條問題。`:`請 ${targets[0]} 號說出最相信誰及原因。`});}
-function eligible(s,p){return p.alive||(!p.ghostUsed&&p.ghostRound<=s.round)}
-function tally(s,votes){need(s.phase==='vote'&&!s.pending,'目前不能結算投票');const redo=!!s.ballot;const candidates=redo?s.ballot.candidates:s.players.filter(p=>p.alive&&p.id!==s.shield).map(p=>p.id);const voters=redo?s.ballot.voters:s.players.filter(p=>eligible(s,p)).map(p=>p.id);const totals={};const participating=[];
-for(const p of s.players){const target=+votes[p.id]||0;const can=voters.includes(p.id);if(!can){need(!target,'這位玩家沒有投票資格');continue}if(p.alive)need(target,'所有活躍玩家必須投票，不可棄權');if(!target)continue;need(target!==p.id,'不可投自己');need(candidates.includes(target),'只能投可被投的活躍候選人');need(target!==s.shield,'不能投鐵匠保護的玩家');totals[target]=(totals[target]||0)+(s.double&&p.role==='mayor'?2:1);participating.push(p.id);}
-s.voteRecords=s.voteRecords||[];s.voteRecords.push({round:s.round,redo,votes:clone(votes),totals:clone(totals)});const top=Math.max(0,...Object.values(totals));const tied=Object.keys(totals).filter(k=>totals[k]===top).map(Number);if(!redo){s.ballot={candidates:[],voters:participating,ghosts:participating.filter(id=>!player(s,id).alive)};}if(tied.length>1&&!redo){s.ballot.candidates=tied;return {redo:true,candidates:tied};}
-s.pending={kind:'vote',sealed:tied.length===1?tied[0]:0,totals,redo};return {redo:false,...s.pending};}
-function publishVote(s){const p=s.pending;need(p?.kind==='vote','沒有待公開票數');s.ballot.ghosts.forEach(id=>player(s,id).ghostUsed=true);if(p.sealed)kill(s,p.sealed,false);s.history.push({round:s.round,type:'投票',text:p.sealed?`${p.sealed} 號被封印。`:'重投後仍平票，本輪沒有封印。',totals:p.totals});const wolf=seat(s,'wolf');if(!wolf.alive)s.winner='good';else if(s.players.filter(p=>p.alive).length<=2||s.round===5)s.winner='wolf';s.pending=null;s.ballot=null;s.phase=s.winner?'ended':'dayend';s.double=false;s.shield=0;}
-function next(s){need(s.phase==='dayend'&&!s.winner,'尚未完成白天結算');s.round++;s.phase='night';s.timer={remaining:180,endAt:null};}
-function publicState(s){return {n:s.n,round:s.round,phase:s.phase,players:s.players.map(({id,alive})=>({id,alive})),history:clone(s.history),winner:s.winner,guide:s.guide,timer:clone(s.timer),roles:ROLES.slice(0,s.n).map(r=>({name:r[1],description:r[2]})),shield:s.shield};}
-const api={ROLES,create,clone,assign,shuffle,intel,start,night,publishNight,phase,skill,tally,publishVote,next,publicState,roleName,eligible};root.Moon=api;if(typeof module!=='undefined')module.exports=api;
+const TITLES=['序幕 · 午夜旅館','第一幕 · 最後進入教室的人','第二幕 · 錯誤的午夜','第三幕 · 最後一段記憶','結局 · 退房'];
+const BUDGET=[300,780,1320,780,120];
+const HINTS=[['先聽經理介紹，然後打開第一幕角色卡。','每個人都有一份別人沒有的資料。','一起合作，沒有人會被淘汰。'],['名冊、房卡、門鎖——三份紀錄講的是同一段時間嗎？','C 卡屬於誰？卡的主人自己怎樣說？卡有沒有借出？','有沒有人親眼看見那個時間進門的人？找找照片和目擊者。'],['每一個時間，是從哪一個鐘讀出來的？','把鐘樓顯示的時間和手錶、相機比較，差了多少？','23:15 被開啟的設備，之後有人把它關掉嗎？'],['哪一段錄音裏，旋律已經在背景播放？哪一段還沒有？','哪一段有很多人的聲音？哪一段只剩一個人自言自語？','十二下鐘聲屬於哪個時刻？最後別忘了留聲機還在循環。'],[]];
+const CAUSES=[['sab','有人蓄意破壞留聲機'],['clock','只因為鐘樓壞了'],['comm','時間及設備資訊沒有妥善傳達'],['ghost','幽靈作祟']];
+function fresh(gameId='new'){return {gameId,stage:0,memory:0,players:8,timer:{remaining:300,endAt:0},hintLevel:0,hintShown:false,scareAt:0,scareUsed:false,photo:false,seq:[],loopOn:true,cause:'',feedback:'',muted:false,vol:50,audio:{clip:'',eventId:'',at:0},updatedAt:0};}
+function remaining(s,now=Date.now()){return s.timer.endAt?Math.max(0,Math.ceil((s.timer.endAt-now)/1000)):s.timer.remaining;}
+function stage(s,n,now){if(!Number.isInteger(n)||n<0||n>4)throw Error('無效幕次');s.stage=n;s.hintLevel=0;s.hintShown=false;s.feedback='';s.scareAt=0;s.timer={remaining:BUDGET[n],endAt:n===4?0:now+BUDGET[n]*1000};if(n===4)s.memory=100;}
+function action(s,name,value,now=Date.now()){
+ switch(name){
+ case 'stage':stage(s,+value,now);break;
+ case 'pass1':s.memory=33;stage(s,2,now);break;
+ case 'pass2':s.memory=66;stage(s,3,now);break;
+ case 'forceEnd':stage(s,4,now);break;
+ case 'timer':{const r=remaining(s,now);s.timer={remaining:r,endAt:s.timer.endAt?0:now+r*1000};break;}
+ case 'duration':{const n=+value;if(!Number.isInteger(n)||n<1||n>3600)throw Error('請輸入 1–3600 秒');s.timer={remaining:n,endAt:0};break;}
+ case 'nextHint':s.hintLevel=Math.min(3,s.hintLevel+1);s.hintShown=true;break;
+ case 'hideHint':s.hintShown=false;break;
+ case 'clearHint':s.hintLevel=0;s.hintShown=false;break;
+ case 'scare':if(s.stage===2&&!s.scareUsed){s.scareAt=now;s.scareUsed=true;}break;
+ case 'skipScare':s.scareAt=0;s.scareUsed=true;s.photo=true;break;
+ case 'mute':s.muted=!s.muted;break;
+ case 'volume':if(!Number.isFinite(+value))throw Error('無效音量');s.vol=Math.min(100,Math.max(0,+value));break;
+ case 'players':if(![8,9,10,11].includes(+value))throw Error('人數須為 8–11 人');s.players=+value;break;
+ case 'fragment':if(s.stage===3&&['甲','乙','丙','丁'].includes(value)&&!s.seq.includes(value))s.seq.push(value);s.feedback='';break;
+ case 'clear':if(s.stage===3)s.seq=[];s.feedback='';break;
+ case 'loop':if(s.stage===3)s.loopOn=!s.loopOn;s.feedback='';break;
+ case 'cause':if(s.stage===3&&CAUSES.some(c=>c[0]===value))s.cause=value;s.feedback='';break;
+ case 'submit':if(s.stage!==3)break;if(s.seq.length<4)s.feedback='還有錄音碎片未排列。';else if(s.seq.join('')==='乙丁甲丙'&&!s.loopOn&&s.cause==='comm')stage(s,4,now);else s.feedback='記憶仍然不穩定……請回到證據，再核對一次。';break;
+ default:throw Error('未知操作');
+ }
+ return s;
+}
+function normalize(v){return {...fresh(v.gameId),...v,seq:Array.isArray(v.seq)?v.seq:[],timer:{...fresh().timer,...v.timer},audio:{...fresh().audio,...v.audio}};}
+const api={TITLES,BUDGET,HINTS,CAUSES,fresh,remaining,action,normalize};root.Midnight=api;if(typeof module!=='undefined')module.exports=api;
 })(globalThis);

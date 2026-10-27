@@ -142,6 +142,167 @@
           ".validate": false
         }
       }
+    },
+    "midnightRooms": {
+      "$room": {
+        ".write": "auth != null && $room.matches(/^[a-f0-9]{32}$/) && ((!data.exists() && newData.child('owner').val() === auth.uid) || (data.child('owner').val() === auth.uid && (!newData.exists() || newData.child('owner').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['owner','public'])",
+        "owner": {
+          ".read": "auth != null && data.val() === auth.uid",
+          ".validate": "newData.isString() && newData.val() === auth.uid"
+        },
+        "public": {
+          ".read": true,
+          ".validate": "newData.hasChildren(['gameId','stage','memory','players','timer','hintLevel','hintShown','scareAt','scareUsed','photo','loopOn','cause','feedback','muted','vol','audio','updatedAt'])",
+          "gameId": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
+          },
+          "stage": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 4"
+          },
+          "memory": {
+            ".validate": "newData.val() === 0 || newData.val() === 33 || newData.val() === 66 || newData.val() === 100"
+          },
+          "players": {
+            ".validate": "newData.isNumber() && newData.val() >= 8 && newData.val() <= 11"
+          },
+          "timer": {
+            ".validate": "newData.hasChildren(['remaining','endAt'])",
+            "remaining": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3600"
+            },
+            "endAt": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "$other": {
+              ".validate": false
+            }
+          },
+          "hintLevel": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 3"
+          },
+          "hintShown": {
+            ".validate": "newData.isBoolean()"
+          },
+          "scareAt": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+          },
+          "scareUsed": {
+            ".validate": "newData.isBoolean()"
+          },
+          "photo": {
+            ".validate": "newData.isBoolean()"
+          },
+          "seq": {
+            "$i": {
+              ".validate": "$i.matches(/^[0-3]$/) && (newData.val() === '甲' || newData.val() === '乙' || newData.val() === '丙' || newData.val() === '丁')"
+            }
+          },
+          "loopOn": {
+            ".validate": "newData.isBoolean()"
+          },
+          "cause": {
+            ".validate": "newData.val() === '' || newData.val() === 'sab' || newData.val() === 'clock' || newData.val() === 'comm' || newData.val() === 'ghost'"
+          },
+          "feedback": {
+            ".validate": "newData.isString() && newData.val().length <= 150"
+          },
+          "muted": {
+            ".validate": "newData.isBoolean()"
+          },
+          "vol": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+          },
+          "audio": {
+            ".validate": "newData.hasChildren(['clip','eventId','at'])",
+            "clip": {
+              ".validate": "newData.val() === '' || newData.val() === 'stop' || newData.val() === 'scare-1' || newData.val() === 'scare-2'"
+            },
+            "eventId": {
+              ".validate": "newData.isString() && newData.val().length <= 32"
+            },
+            "at": {
+              ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+            },
+            "$other": {
+              ".validate": false
+            }
+          },
+          "updatedAt": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 9999999999999"
+          },
+          "$other": {
+            ".validate": false
+          }
+        },
+        "requests": {
+          ".read": "auth != null && data.parent().child('owner').val() === auth.uid",
+          "$requestId": {
+            ".write": "auth != null && !data.exists() && newData.exists() && newData.child('uid').val() === auth.uid && root.child('midnightRooms').child($room).child('public/stage').val() === 3",
+            ".validate": "newData.hasChildren(['id','uid','gameId','action','value','at'])",
+            "id": {
+              ".validate": "newData.val() === $requestId && $requestId.matches(/^[a-f0-9]{32}$/)"
+            },
+            "gameId": {
+              ".validate": "newData.val() === root.child('midnightRooms').child($room).child('public/gameId').val()"
+            },
+            "action": {
+              ".validate": "newData.val() === 'fragment' || newData.val() === 'clear' || newData.val() === 'loop' || newData.val() === 'cause' || newData.val() === 'submit'"
+            },
+            "value": {
+              ".validate": "newData.val() === '' || newData.val() === '甲' || newData.val() === '乙' || newData.val() === '丙' || newData.val() === '丁' || newData.val() === 'sab' || newData.val() === 'clock' || newData.val() === 'comm' || newData.val() === 'ghost'"
+            },
+            "at": {
+              ".validate": "newData.isNumber() && newData.val() >= now - 15000 && newData.val() <= now + 15000"
+            },
+            "$other": {
+              ".validate": false
+            },
+            "uid": {
+              ".validate": "newData.isString() && newData.val() === auth.uid"
+            }
+          }
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "midnightPairings": {
+      "$pair": {
+        ".read": "auth != null && data.child('owner').val() === auth.uid",
+        ".write": "auth != null && $pair.matches(/^[a-f0-9]{32}$/) && ((!data.exists() && newData.child('owner').val() === auth.uid && !newData.child('claim').exists()) || (data.child('owner').val() === auth.uid && (!newData.exists() || (newData.child('owner').val() === auth.uid && newData.child('key').val() === data.child('key').val() && newData.child('createdAt').val() === data.child('createdAt').val()))))",
+        ".validate": "newData.hasChildren(['owner','key','createdAt'])",
+        "owner": {
+          ".validate": "newData.isString() && (!data.exists() || newData.val() === data.val())"
+        },
+        "key": {
+          ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
+        },
+        "createdAt": {
+          ".validate": "newData.isNumber() && (!data.exists() || newData.val() === data.val()) && newData.val() <= now + 60000"
+        },
+        "claim": {
+          ".write": "auth != null && newData.exists() && newData.child('uid').val() === auth.uid && newData.child('key').val() === data.parent().child('key').val() && data.parent().child('owner').exists() && ((!data.exists() && now - data.parent().child('createdAt').val() <= 600000) || data.child('uid').val() === auth.uid)",
+          ".validate": "newData.hasChildren(['uid','key'])",
+          "uid": {
+            ".validate": "newData.isString() && (!data.exists() || newData.val() === data.val())"
+          },
+          "key": {
+            ".validate": "newData.val() === newData.parent().parent().child('key').val()"
+          },
+          "room": {
+            ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/) && root.child('midnightRooms').child(newData.val()).child('owner').val() === newData.parent().child('uid').val()"
+          },
+          "$other": {
+            ".validate": false
+          },
+          ".read": "auth != null && data.child('uid').val() === auth.uid"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
     }
   }
 }

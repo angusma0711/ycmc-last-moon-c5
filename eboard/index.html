@@ -1,5 +1,122 @@
-<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="referrer" content="no-referrer"><meta name="viewport" content="width=device-width,initial-scale=1"><title>最後的月夜 · C5</title><link rel="stylesheet" href="style.css?v=7"></head><body>
-<header><a class="brand" href="#"><span class="sigil">月</span><span>最後的月夜<small>THE LAST MOON · C5</small></span></a><div class="headright"><span id="connection" role="status">本機模式</span><button id="fullscreen">全螢幕</button><button id="teacherButton">導師控制</button></div></header>
-<main id="board"></main><aside id="teacher" hidden><div class="teacherhead"><div><small>PRIVATE CONTROL</small><h1>只有導師可看</h1></div><button id="closeTeacher">關閉私密畫面</button></div><p class="warning">請只在私人 iPad 開啟。若此裝置連接投影或 e-board，全班仍能看見此頁。</p><nav id="tabs"><button data-tab="flow">主持流程</button><button data-tab="setup">身份與情報</button><button data-tab="sync">連接大屏</button><button data-tab="records">紀錄與重置</button></nav><div id="controls"></div></aside>
-<dialog id="confirmTeacher"><h2>進入導師私密畫面</h2><p>確認這是私人裝置，沒有投影或鏡像到課室大屏。單純切換畫面不能保護私隱。</p><button id="enterTeacher">這是私人裝置，繼續</button><button id="cancelTeacher">取消</button></dialog>
-<div id="toast" role="alert" hidden></div><script src="firebase-config.js"></script><script src="engine.js"></script><script src="app.js?v=5"></script><script src="vendor/qrcode.js"></script><script src="pairing.js?v=6"></script></body></html>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>午夜十三號 · 被遺忘的住客</title>
+<meta name="referrer" content="no-referrer">
+<link rel="stylesheet" href="app.css?v=1">
+<style>
+:root{--bg:#0f0d0b;--panel:#16120f;--line:#3a3127;--ink:#efe4cc;--soft:#d6c9ae;--muted:#b8a27c;--gold:#c49a52;--hi:#e6c27a}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:#000;color:var(--ink);font-family:"PingFang TC","Noto Sans TC","Microsoft JhengHei",sans-serif}
+.serif{font-family:"Songti TC","Noto Serif TC","PMingLiU",serif}
+#stage{position:absolute;left:50%;top:50%;width:1280px;height:720px;transform-origin:center;background:var(--bg);overflow:hidden;display:flex;flex-direction:column}
+header{display:flex;align-items:center;gap:24px;padding:16px 32px;border-bottom:1px solid var(--line);background:var(--panel)}
+.kicker{font-size:14px;letter-spacing:4px;color:var(--muted)}
+#actTitle{font-size:30px;font-weight:900}
+.bar{width:340px;height:16px;border-radius:8px;background:#2a231c;border:1px solid #4d4031;overflow:hidden}
+#memFill{height:100%;width:0;background:var(--gold);transition:width 1.2s ease}
+#clock{font-size:36px;font-weight:700;font-variant-numeric:tabular-nums}
+main{flex:1;position:relative;display:flex;align-items:center;justify-content:center;padding:24px 64px}
+.view{display:none;flex-direction:column;align-items:center;gap:20px;text-align:center;max-width:1100px}
+.view.on{display:flex}
+h1{margin:0;font-size:64px;letter-spacing:6px}
+h2{margin:0;font-size:56px}
+p.lead{margin:0;font-size:26px;line-height:1.7;color:var(--soft)}
+.chip{padding:12px 20px;border:1px solid #5a4a35;border-radius:6px;font-size:22px}
+.row{display:flex;gap:16px;flex-wrap:wrap;justify-content:center}
+.box{padding:18px 22px;border:1px solid #5a4a35;border-radius:8px;background:#17130f;text-align:left;font-size:22px}
+button{font-family:inherit;color:var(--ink);background:#221d17;border:1px solid #6d5a3c;border-radius:6px;min-height:48px;padding:8px 18px;font-size:18px;cursor:pointer;touch-action:manipulation}
+button:hover{background:#2e271f}
+button:focus-visible,input:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+button[disabled]{opacity:.4;cursor:default}
+button.sel{border-color:var(--hi);background:#3a2f1e}
+.t{font-size:14px;min-height:44px;padding:6px 10px;background:#1a1612;border-color:#4a4032}
+.console{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;width:1120px}
+.pane{display:flex;flex-direction:column;gap:10px;padding:16px;border:1px solid #4d4031;border-radius:8px;background:#17130f;text-align:left}
+.pane h3{margin:0;font-size:20px}
+.frag{font-size:24px}
+#hint{position:absolute;left:64px;right:64px;bottom:16px;padding:12px 20px;border-radius:8px;background:#1f1a14;border:1px solid #6d5a3c;font-size:22px;display:none;gap:14px;text-align:left}
+#hint b{color:var(--gold);white-space:nowrap}
+#scare{position:absolute;inset:0;background:#070605;display:none;flex-direction:column;align-items:center;justify-content:center;gap:28px;z-index:20}
+.photo{width:420px;height:280px;border:10px solid #d9ceb4;background:#6f6655;display:flex;align-items:flex-end;justify-content:center;gap:12px;padding-bottom:30px;filter:sepia(.6) blur(.4px)}
+.photo i{display:block;width:16px;background:#2e2a24;border-radius:8px 8px 2px 2px}
+#teacher{position:absolute;top:0;right:0;bottom:0;width:400px;background:#120f0c;border-left:2px solid #6d5a3c;z-index:25;padding:16px 18px 70px;display:none;flex-direction:column;gap:10px;overflow-y:auto;font-size:14px}
+#teacher .lbl{color:#a8987c}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:6px}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+#tBtn{position:absolute;right:12px;bottom:12px;z-index:30;opacity:.55}
+.confetti{animation:rise 1.4s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div id="session" class="session"></div>
+<div id="connection" class="connection" role="status"></div>
+<div id="boardTools" hidden><button id="audioUnlock">點一下啟用課堂聲音</button><button id="fullscreen">全螢幕</button></div>
+<div id="stage" hidden>
+<header>
+  <div style="flex:1"><div class="kicker">午夜旅館 · 第十三號教室</div><div id="actTitle" class="serif"></div></div>
+  <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px"><div id="memLabel" style="font-size:16px;color:#cdbb98"></div><div class="bar"><div id="memFill"></div></div></div>
+  <div style="width:130px;text-align:center"><div id="timerLabel" style="font-size:14px;color:var(--muted)"></div><div id="clock" class="serif"></div></div>
+</header>
+<main>
+  <section class="view" data-v="0">
+    <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true" fill="none" stroke="#c49a52" stroke-width="3"><circle cx="60" cy="60" r="50"/><circle cx="60" cy="60" r="4" fill="#c49a52"/><line x1="60" y1="60" x2="60" y2="24"/><line x1="60" y1="60" x2="84" y2="70"/></svg>
+    <h1 class="serif">午夜十三號</h1>
+    <div class="serif" style="font-size:32px;color:#d9c7a3">被遺忘的住客</div>
+    <p class="lead">三十年前的萬聖節舞會之後，這間旅館的住客都忘記了自己的名字。<br>今晚，你們要一起找回那段被封存的記憶——沒有人是壞人，只有被遺漏的真相。</p>
+  </section>
+  <section class="view" data-v="1">
+    <div class="kicker" style="color:var(--gold);font-size:20px">第一幕</div>
+    <h2 class="serif">最後進入教室的人</h2>
+    <p class="lead">門在午夜前關上，之後再沒有人進去。<br>誰是最後一個走進第十三號教室的人？</p>
+    <div class="row"><span class="chip">訪客登記簿</span><span class="chip">房卡分配表</span><span class="chip">門鎖紀錄</span><span class="chip">證詞與照片</span></div>
+    <div style="font-size:22px;color:#e8d7b2">提交答案時，請說出最少兩項互相支持的證據。</div>
+  </section>
+  <section class="view" data-v="2">
+    <div class="kicker" style="color:var(--gold);font-size:20px">第二幕</div>
+    <h2 class="serif">錯誤的午夜</h2>
+    <p class="lead">每一個時間，都是從哪一個鐘讀出來的？</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;width:860px">
+      <div class="box"><b style="color:#e8d7b2">時間調查組</b><br>流程表 · 提前通知 · 鐘樓檢查記錄</div>
+      <div class="box"><b style="color:#e8d7b2">設備調查組</b><br>留聲機維修日誌 · 證詞 · 照片</div>
+    </div>
+    <div id="photoNote" class="box" style="display:none;border-style:dashed;border-color:var(--gold)">一張褪色照片出現了：照片收藏者，請翻開「照片二」的背面。</div>
+  </section>
+  <section class="view" data-v="3">
+    <div class="row" style="align-items:baseline"><span class="kicker" style="color:var(--gold);font-size:20px">第三幕</span><h2 class="serif" style="font-size:40px">最後一段記憶 · 修復控制台</h2></div>
+    <div class="console">
+      <div class="pane"><h3>① 錄音碎片排序</h3><div style="font-size:15px;color:#bcae92">依時間先後按下碎片</div>
+        <div class="g2" id="frags"></div>
+        <div id="seq" style="font-size:18px;padding:6px 10px;border-radius:5px;background:#0f0d0b;border:1px solid var(--line)"></div>
+        <button class="t" id="clearSeq">清除重排</button></div>
+      <div class="pane"><h3>② 留聲機模式</h3><div style="font-size:15px;color:#bcae92">目前狀態</div>
+        <div id="loopText" class="serif" style="font-size:34px;font-weight:900"></div>
+        <button id="loopBtn">切換循環模式</button></div>
+      <div class="pane"><h3>③ 事件主因</h3><div id="causes" style="display:flex;flex-direction:column;gap:8px"></div></div>
+    </div>
+    <div class="row" style="align-items:center"><button id="submit" style="font-size:22px;background:#5a4524;border-color:var(--gold);padding:10px 36px">修復記憶</button><div id="feedback" role="status" style="font-size:20px;color:#e8c9a0;min-width:420px;text-align:left"></div></div>
+  </section>
+  <section class="view" data-v="4">
+    <div class="serif confetti" style="font-size:64px;font-weight:900;letter-spacing:8px;color:var(--hi)">CHECK-OUT COMPLETE</div>
+    <div style="font-size:28px">記憶修復 100% · 所有住客已找回名字</div>
+    <p class="lead" style="font-size:22px">經理：「留聲機終於停下來了。那個模糊的『第十三個身影』，並不是多出來的住客——它是大家一起忘記的那段回憶。<br>沒有人想破壞舞會。只是每個人都少說了一句話。今晚，你們把那些話說出來了。歡迎退房。」</p>
+  </section>
+  <div id="hint" role="status"><b id="hintLvl"></b><span id="hintText"></span></div>
+</main>
+
+<div id="scare" aria-live="polite">
+  <div id="s1" style="font-size:22px;color:#5d5246;letter-spacing:8px">…… 沙 …… 沙 ……</div>
+  <div id="s2" style="display:none;flex-direction:column;align-items:center;gap:24px"><div class="photo" id="figs"></div><div class="serif" style="font-size:44px;font-weight:900;color:#e6dcc6">你們是不是忘記了我？</div></div>
+  <div id="s3" class="serif" style="display:none;font-size:36px;color:#cbbd9f">「時間不對……你們記錯了……」</div>
+  <button class="t" style="position:absolute;right:24px;bottom:24px" data-act="skipScare">跳過</button>
+</div>
+
+
+</div>
+
+
+<script src="firebase-config.js"></script><script src="vendor/qrcode.js"></script><script src="engine.js"></script><script src="dialogue.js"></script><script src="app.js" type="module"></script>
+</body></html>
