@@ -33,11 +33,11 @@ fs.mkdirSync('tmp/pdfs/midnight-13',{recursive:true});
   await board.waitForFunction(()=>window.phaseTrace.some(e=>e.phase==='s3')&&window.phaseTrace.at(-1)?.phase==='off',{},{timeout:25000});
   const trace=await board.evaluate(()=>({audio:window.audioTrace,phases:window.phaseTrace}));fs.writeFileSync('tmp/pdfs/midnight-13/live-audio-timing.json',JSON.stringify(trace,null,2));
   console.log(JSON.stringify(trace,null,2));
-  for(const file of ['scare-1.wav','scare-2.wav']){
+  for(const file of ['scare-1-ghost.wav','scare-2-ghost.wav']){
    const end=trace.audio.find(e=>e.file===file&&e.event==='ended');assert(end,'Missing natural ended event: '+file);assert(Math.abs(end.current-end.duration)<0.03,'Incomplete playback: '+file);
    console.log('PASS full natural playback',file,end.duration.toFixed(3)+'s');
   }
-  const firstEnd=trace.audio.find(e=>e.file==='scare-1.wav'&&e.event==='ended').time,secondPlay=trace.audio.find(e=>e.file==='scare-2.wav'&&e.event==='playing').time;
+  const firstEnd=trace.audio.find(e=>e.file==='scare-1-ghost.wav'&&e.event==='ended').time,secondPlay=trace.audio.find(e=>e.file==='scare-2-ghost.wav'&&e.event==='playing').time;
   assert(firstEnd<=secondPlay,'Voice lines overlap');assert.equal(trace.phases.map(e=>e.phase).join(','),'s1,s2,s3,off');assert.deepEqual(errors,[]);
   await board.locator('#photoNote').waitFor({state:'visible'});assert(await phone.locator('#scareControl').isDisabled());console.log('PASS both voice lines finish naturally with music ducking');await board.waitForFunction(()=>window.__music.target>.1);await board.waitForFunction(start=>window.__music.context.currentTime>start+33,musicTime,{timeout:45000});console.log('PASS music remains active beyond full 32-second loop');await phone.screenshot({path:'tmp/pdfs/midnight-13/phone-music.png',fullPage:true});console.log('BACKGROUND MUSIC QA PASSED');
  }finally{
