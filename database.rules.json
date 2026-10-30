@@ -233,6 +233,12 @@
           },
           "$other": {
             ".validate": false
+          },
+          "bgmOn": {
+            ".validate": "newData.isBoolean()"
+          },
+          "bgmVol": {
+            ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
           }
         },
         "requests": {
