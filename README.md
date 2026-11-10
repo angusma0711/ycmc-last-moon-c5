@@ -1,5 +1,7 @@
 # 午夜十三號：被遺忘的住客
 
+另有獨立遊戲入口：[怪盜 Lupin：世紀大追捕](https://angusma0711.github.io/ycmc-last-moon-c5/lupin/) · [Lupin 使用說明](lupin/README.md)
+
 P4–P6 · 8–11 人 · 60 分鐘 · 合作解謎。取代原「最後的月夜」公開入口，沿用原 GitHub Pages 網址：
 
 https://angusma0711.github.io/ycmc-last-moon-c5/
