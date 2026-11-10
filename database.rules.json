@@ -312,8 +312,8 @@
     },
     "lupinRooms": {
       "$room": {
-        ".write": "auth != null && $room.matches(/^[a-f0-9]{32}$/) && ((!data.exists() && newData.child('owner').val() === auth.uid) || (data.child('owner').val() === auth.uid && (!newData.exists() || newData.child('owner').val() === auth.uid)))",
-        ".validate": "newData.hasChildren(['owner','public'])",
+        ".write": "auth != null && $room.matches(/^[a-f0-9]{32}$/) && ((!data.exists() && newData.child('owner').val() === auth.uid) || (data.child('owner').val() === auth.uid && !newData.exists()) || (data.exists() && newData.child('owner').val() === data.child('owner').val() && (data.child('owner').val() === auth.uid || root.child('lupinTeams').child($room).child('guest/uid').val() === auth.uid)))",
+        ".validate": "newData.hasChildren(['owner','public']) && ((!data.child('revision').exists() && !newData.child('revision').exists() && !newData.child('privateState').exists()) || (newData.child('privateState').isString() && newData.child('revision').isNumber() && ((!data.child('revision').exists() && newData.child('revision').val() === 1) || newData.child('revision').val() === data.child('revision').val()+1)))",
         "owner": {
           ".read": "auth != null && data.val() === auth.uid",
           ".validate": "newData.isString() && newData.val() === auth.uid"
@@ -366,6 +366,13 @@
         },
         "$other": {
           ".validate": false
+        },
+        ".read": "auth != null && (data.child('owner').val() === auth.uid || root.child('lupinTeams').child($room).child('guest/uid').val() === auth.uid)",
+        "revision": {
+          ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() <= 999999999 && newData.val() % 1 === 0"
+        },
+        "privateState": {
+          ".validate": "newData.isString() && newData.val().length <= 250000"
         }
       }
     },
@@ -399,6 +406,35 @@
             ".validate": false
           },
           ".read": "auth != null && data.child('uid').val() === auth.uid"
+        },
+        "$other": {
+          ".validate": false
+        }
+      }
+    },
+    "lupinTeams": {
+      "$room": {
+        ".read": "auth != null && root.child('lupinRooms').child($room).child('owner').val() === auth.uid",
+        ".write": "auth != null && root.child('lupinRooms').child($room).child('owner').val() === auth.uid && (!newData.exists() || (!data.child('guest').exists() && !newData.child('guest').exists()))",
+        ".validate": "newData.hasChildren(['key','issued'])",
+        "key": {
+          ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)"
+        },
+        "issued": {
+          ".validate": "newData.isNumber() && newData.val() <= now"
+        },
+        "guest": {
+          ".write": "auth != null && newData.child('uid').val() === auth.uid && newData.child('key').val() === data.parent().child('key').val() && data.parent().child('key').exists() && root.child('lupinRooms').child($room).child('owner').exists() && root.child('lupinRooms').child($room).child('owner').val() !== auth.uid && ((!data.exists() && now-data.parent().child('issued').val() <= 600000) || data.child('uid').val() === auth.uid)",
+          ".validate": "newData.hasChildren(['uid','key'])",
+          "uid": {
+            ".validate": "newData.isString()"
+          },
+          "key": {
+            ".validate": "newData.isString()"
+          },
+          "$other": {
+            ".validate": false
+          }
         },
         "$other": {
           ".validate": false
