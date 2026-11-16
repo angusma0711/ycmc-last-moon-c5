@@ -7,7 +7,7 @@ function render(data) {
   const final=data.status==='finished';
   $('roundTitle').textContent=final?`最終排名 · ${data.totalRounds} 回合完成`:(data.completedRound?`已完成第 ${data.completedRound} 回合 · 下一輪 ${data.nextRound}`:'準備開始 · 第 1 回合');
   $('phase').textContent=final?'已按最後收市價計算總資產':'等待本輪結算';
-  pricesView($('prices'),data.prices,data.trends);
+  pricesView($('prices'),data.prices,data.trends,data.totalRounds);
   $('ranking').replaceChildren();
   for(const player of Object.values(data.ranking)) {
     const tr=el('tr');
