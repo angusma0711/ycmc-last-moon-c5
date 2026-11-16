@@ -8,32 +8,35 @@ function svgElement(tag, attributes, text) {
   return node;
 }
 function priceChart(name, values, totalRounds) {
-  const left = 40, right = 368, top = 18, bottom = 72;
+  const left = 56, right = 402, top = 36, bottom = 170;
   const x = round => left + round * (right - left) / totalRounds;
   const y = price => bottom - (price - 60) * (bottom - top) / 100;
   const svg = svgElement('svg', {
-    viewBox: '0 0 380 100', class: 'price-chart', role: 'img',
+    viewBox: '0 0 420 228', class: 'price-chart', role: 'img',
     preserveAspectRatio: 'none',
     'aria-label': name + '折線圖，開始及各回合收市價：' + values.join('、') + ' 幣'
   });
-  for (const price of [60, 100, 160]) {
+  for (const price of [60, 80, 100, 120, 140, 160]) {
     svg.append(svgElement('line', {x1:left, y1:y(price), x2:right, y2:y(price), class:'chart-grid'}));
     svg.append(svgElement('text', {x:left-8, y:y(price)+4, 'text-anchor':'end', class:'chart-axis'}, price));
   }
   svg.append(svgElement('line', {x1:left, y1:top, x2:left, y2:bottom, class:'chart-axis-line'}));
+  svg.append(svgElement('line', {x1:left, y1:bottom, x2:right, y2:bottom, class:'chart-axis-line'}));
+  svg.append(svgElement('text', {x:12, y:18, class:'chart-axis-title'}, '價格（幣）'));
+  svg.append(svgElement('text', {x:right, y:219, 'text-anchor':'end', class:'chart-axis-title'}, '回合'));
   for (let round = 0; round <= totalRounds; round++) {
     svg.append(svgElement('line', {x1:x(round), y1:bottom, x2:x(round), y2:bottom+4, class:'chart-axis-line'}));
-    svg.append(svgElement('text', {x:x(round), y:92, 'text-anchor':'middle', class:'chart-axis'}, round === 0 ? '開始' : round));
+    svg.append(svgElement('text', {x:x(round), y:194, 'text-anchor':'middle', class:'chart-axis'}, round === 0 ? '開始' : round));
   }
   svg.append(svgElement('polyline', {
     points: values.map((price, round) => `${x(round)},${y(price)}`).join(' '),
-    fill:'none', stroke:'currentColor', 'stroke-width':2.5, 'stroke-linejoin':'round'
+    fill:'none', stroke:'currentColor', 'stroke-width':3, 'stroke-linejoin':'round'
   }));
   values.forEach((price, round) => {
-    const dot = svgElement('circle', {cx:x(round), cy:y(price), r:3.5, class:'chart-point'});
+    const dot = svgElement('circle', {cx:x(round), cy:y(price), r:4, class:'chart-point'});
     dot.append(svgElement('title', {}, `${round === 0 ? '開始' : '第 '+round+' 回合收市'}：${price} 幣`));
     svg.append(dot);
-    svg.append(svgElement('text', {x:x(round), y:y(price)-8, 'text-anchor':'middle', class:'chart-value'}, price));
+    svg.append(svgElement('text', {x:x(round), y:y(price)-10, 'text-anchor':'middle', class:'chart-value'}, price));
   });
   return svg;
 }

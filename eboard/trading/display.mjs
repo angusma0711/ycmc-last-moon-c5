@@ -9,10 +9,25 @@ function render(data) {
   $('phase').textContent=final?'已按最後收市價計算總資產':'等待本輪結算';
   pricesView($('prices'),data.prices,data.trends,data.totalRounds);
   $('ranking').replaceChildren();
-  for(const player of Object.values(data.ranking)) {
-    const tr=el('tr');
-    for(const value of [player.rank,player.id+(player.name?' · '+player.name:''),player.cash.toLocaleString(),player.netWorth.toLocaleString()])tr.append(el('td',String(value)));
-    $('ranking').append(tr);
+  const players = Object.values(data.ranking);
+  const halfway = Math.ceil(players.length / 2);
+  for (const group of [players.slice(0, halfway), players.slice(halfway)]) {
+    const table = el('table', undefined, 'ranking');
+    const head = el('thead'), headings = el('tr'), body = el('tbody');
+    for (const label of ['排名', '學生', '現金', '總資產']) headings.append(el('th', label));
+    head.append(headings);
+    for (const player of group) {
+      const row = el('tr');
+      const name = player.id + (player.name ? ' · ' + player.name : '');
+      for (const value of [player.rank, name, player.cash.toLocaleString(), player.netWorth.toLocaleString()]) {
+        const cell = el('td', String(value));
+        cell.title = String(value);
+        row.append(cell);
+      }
+      body.append(row);
+    }
+    table.append(head, body);
+    $('ranking').append(table);
   }
   $('volumeTitle').textContent=data.completedRound?`第 ${data.completedRound} 回合全班成交件數`:'尚未有成交';
   $('volumes').replaceChildren();
