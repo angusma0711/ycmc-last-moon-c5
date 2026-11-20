@@ -43,3 +43,8 @@
   .display-grid{grid-template-columns:1fr}
 }
 @media(max-width:600px){.ranking-columns{grid-template-columns:1fr}.display .ranking td{font-size:18px}}
+
+.header-tools{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.lesson-link{display:inline-flex;align-items:center;min-height:38px;padding:8px 12px;color:#fff;text-decoration:none;border:1px solid #819b9d;border-radius:22px;font-size:14px;font-weight:650;white-space:nowrap}
+.lesson-link:hover{background:#254957}
+@media(max-width:760px){.header-tools{margin-top:14px}.header-tools .badge{margin-top:0}}

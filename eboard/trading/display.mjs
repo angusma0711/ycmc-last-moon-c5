@@ -2,6 +2,7 @@ import {watchPublic} from './cloud.mjs';
 import {el,products,pricesView,showMessage} from './view.mjs';
 const $=id=>document.getElementById(id);
 const session=new URL(location.href).searchParams.get('session');
+if (/^[a-f0-9]{32}$/.test(session || '')) $('learnLink').href = 'learn.html?session=' + session;
 function render(data) {
   showMessage('');
   const final=data.status==='finished';

@@ -27,3 +27,11 @@ Gold's deterministic +15/−15 gives a guaranteed 5-coin profit per unit per two
 - Physical phone camera scan and a real classroom session have not been tested.
 
 No outstanding configuration blockers. Test-created cloud classrooms and anonymous accounts were cleaned up.
+
+## 2026-11-20 — illustrated lesson
+
+- Six generated illustration panels, individually displayed with short accessible labels; no image text or hidden game formulas.
+- All six pages fit 1366×768 and 1920×1080; 390px mobile layout checked.
+- Price choices 120/80 carry through to holdings valuation and sale; totals 1,015/975 and cash 1,010/970 verified.
+- Teacher notes, keyboard navigation, image loading and public-only return link checked. Lesson loads no Firebase, host or engine modules.
+- Existing release unit suite remains 23/23 passing.

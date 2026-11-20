@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="zh-Hant-HK">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>圖解股票 · 秘密股票交易所</title>
+  <link rel="stylesheet" href="learn.css">
+  <link rel="preload" href="assets/stock-story.png" as="image">
+</head>
+<body>
+  <header class="lesson-header">
+    <a id="backToDisplay" hidden>← 返回價格畫面</a>
+    <span class="lesson-brand">秘密股票交易所 <span>／ 圖解股票</span></span>
+    <button id="fullscreen" type="button" aria-label="切換全螢幕">⛶ 全螢幕</button>
+  </header>
+  <main>
+    <nav id="chapters" aria-label="教學章節"></nav>
+    <section class="lesson-slide" aria-labelledby="slideTitle">
+      <div class="story-visual" id="storyVisual" role="img"></div>
+      <div class="explanation">
+        <div class="step-label" id="stepLabel"></div>
+        <h1 id="slideTitle" tabindex="-1"></h1>
+        <div id="visualExplanation" aria-live="polite"></div>
+        <p id="slideCaption" class="slide-caption"></p>
+      </div>
+    </section>
+    <nav class="slide-controls" aria-label="圖片導覽">
+      <button id="previous" type="button">← 上一張</button>
+      <span id="progress" role="status"></span>
+      <button id="next" type="button">下一張 →</button>
+    </nav>
+  </main>
+  <footer>
+    <span id="exampleNote">股份是擁有權；紙卡只是圖像比喻。</span>
+    <button id="teacherNotes" type="button">教師備註</button>
+  </footer>
+  <dialog id="notes" aria-labelledby="notesTitle">
+    <h2 id="notesTitle">教師備註</h2>
+    <ul>
+      <li>目標：分辨公司擁有權、買賣、現金與持貨市值，明白價格可升可跌。</li>
+      <li>先用麵包店的 10 等份作股份比喻；真實股票通常以電子紀錄持有。買賣圖示的是持有人之間的轉讓，並非每次都把錢交給公司。</li>
+      <li>真實股價受公司表現、消息、預期及市場供求等因素影響。好消息不保證上升，這裡的 120／80 只是示例。</li>
+      <li>數字示範採用遊戲每件 5 幣的手續費。真實證券交易費用不同；此頁沒有介紹全部實際費用、股息或投資程序。</li>
+      <li>本遊戲三項虛構商品不是公司股份，價格另有遊戲規則，不能用來預測真實股市。</li>
+      <li>討論：為甚麼價格變了，錢包數字不變，總資產卻會變？請學生指圖解釋。</li>
+    </ul>
+    <p>參考：<a href="https://www.hkex.com.hk/global/exchange/faq/products/securities/equity-securites?sc_lang=zh-hk" target="_blank" rel="noopener">香港交易所：股本證券</a>、<a href="https://www.ifec.org.hk/web/tc/investment/investment-products/stock/stock-trading/index.page" target="_blank" rel="noopener">投委會：買賣股票</a>。</p>
+    <button id="closeNotes" type="button">返回圖片</button>
+  </dialog>
+  <script type="module" src="learn.mjs"></script>
+</body>
+</html>
