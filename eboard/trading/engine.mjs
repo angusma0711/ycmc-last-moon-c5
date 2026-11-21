@@ -3,7 +3,7 @@ const keys = Object.keys(PRODUCTS);
 const copy = value => structuredClone(value);
 const clamp = (n,min,max) => Math.max(min,Math.min(max,n));
 export function createGame(count=11,totalRounds=8,names=[]) {
-  if (!Number.isInteger(count)||count<8||count>11||![6,8,10].includes(totalRounds)) throw Error('人數須為 8–11，回合須為 6、8 或 10。');
+  if (!Number.isInteger(count)||count<2||count>12||![6,8,10].includes(totalRounds)) throw Error('人數須為 2–12，回合須為 6、8 或 10。');
   return {schemaVersion:4,totalRounds,completedRound:0,prices:{blue:100,gold:100,red:100},players:Array.from({length:count},(_,i)=>({id:String(i+1).padStart(2,'0'),name:String(names[i]||'').trim().slice(0,20),cash:1000,holdings:{blue:0,gold:0,red:0}})),history:[]};
 }
 export function netWorth(player,prices) {return player.cash+keys.reduce((n,k)=>n+player.holdings[k]*prices[k],0);}

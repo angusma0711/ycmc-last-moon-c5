@@ -493,10 +493,10 @@
             "blue": {
               ".validate": "newData.hasChildren([\"buy\", \"sell\"])",
               "buy": {
-                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 33"
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 36"
               },
               "sell": {
-                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 33"
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 36"
               },
               "$other": {
                 ".validate": false
@@ -505,10 +505,10 @@
             "gold": {
               ".validate": "newData.hasChildren([\"buy\", \"sell\"])",
               "buy": {
-                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 33"
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 36"
               },
               "sell": {
-                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 33"
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 36"
               },
               "$other": {
                 ".validate": false
@@ -517,10 +517,10 @@
             "red": {
               ".validate": "newData.hasChildren([\"buy\", \"sell\"])",
               "buy": {
-                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 33"
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 36"
               },
               "sell": {
-                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 33"
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 36"
               },
               "$other": {
                 ".validate": false
@@ -555,11 +555,11 @@
             }
           },
           "ranking": {
-            ".validate": "newData.hasChildren(['0','1','2','3','4','5','6','7'])",
+            ".validate": "newData.hasChildren(['0','1'])",
             "$i": {
-              ".validate": "newData.hasChildren([\"id\", \"name\", \"cash\", \"netWorth\", \"rank\"]) && $i.matches(/^(0|[1-9]|10)$/)",
+              ".validate": "newData.hasChildren([\"id\", \"name\", \"cash\", \"netWorth\", \"rank\"]) && $i.matches(/^(0|[1-9]|1[01])$/)",
               "id": {
-                ".validate": "newData.isString() && newData.val().matches(/^(0[1-9]|1[01])$/)"
+                ".validate": "newData.isString() && newData.val().matches(/^(0[1-9]|1[0-2])$/)"
               },
               "name": {
                 ".validate": "newData.isString() && newData.val().length <= 20"
@@ -571,7 +571,7 @@
                 ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 0 && newData.val() <= 999999999"
               },
               "rank": {
-                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 1 && newData.val() <= 11"
+                ".validate": "newData.isNumber() && newData.val() % 1 === 0 && newData.val() >= 1 && newData.val() <= 12"
               },
               "$other": {
                 ".validate": false
