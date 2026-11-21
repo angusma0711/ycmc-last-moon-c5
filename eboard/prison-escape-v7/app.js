@@ -140,11 +140,11 @@ function choice(label, type, index, style = '') {
 }
 
 function tradeControls(player, station) {
-  const sources = game.surplus(player, 2);
+  const sources = game.surplus(player, station ? 2 : 3);
   const from = sources.includes(tradeFrom) ? tradeFrom : sources[0];
   const result = game.materials.map(([label, symbol], i) => i === from ? '' :
     button(icon(symbol) + ' ' + label, 'trade', 'data-index="' + i + '" data-from="' + from + '"')).join('');
-  return '<h3>' + (station ? '交換站 · 1 → 1' : '物資交換 · 2 → 1') + '</h3>' +
+  return '<h3>' + (station ? '交換站 · 1 → 1' : '物資交換 · 3 → 1') + '</h3>' +
     '<div class="trade-line"><div class="choices" aria-label="交出物資">' + sources.map(i =>
       choice(icon(game.materials[i][1]) + ' ' + game.materials[i][0], 'trade-source', i, from === i ? 'picked' : '')).join('') +
     '</div><span aria-hidden="true">↓</span><div class="choices" aria-label="換入物資">' + result +
@@ -204,7 +204,8 @@ function turnCards(view) {
         '<div><small>獲得物資</small><strong>' + title + '</strong></div><b class="gain-quantity">＋1</b></article>';
     }
     const event = card.kind === 'event';
-    const image = event ? card.index : card.index + 8;
+    const eventImages = [0, 1, 2, 5, 4, 5, 6, 6];
+    const image = event ? eventImages[card.index] : card.index + 8;
     const title = event ? game.events[card.index] : game.skills[card.index][0];
     const captions = { event: '事件卡', draw: '抽到技能', gainSkill: '獲得技能', skill: '技能發動' };
     const caption = captions[card.kind];

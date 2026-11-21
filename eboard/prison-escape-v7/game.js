@@ -18,9 +18,9 @@
   const board = ['start', 'material', 'blank', 'skill', 'jail', 'material', 'event', 'blank',
     'material', 'skill', 'blank', 'jail', 'material', 'event', 'blank', 'skill', 'material',
     'blank', 'event', 'exchange'];
-  const events = ['神秘包裹', '意外發現', '秘密走廊', '幸運巡查', '突擊搜查', '違反作息', '走錯通道', '平安無事'];
+  const events = ['神秘包裹', '意外發現', '秘密走廊', '臨時封鎖', '突擊搜查', '違反作息', '走錯通道', '巡邏阻截'];
   const eventEffects = ['隨機獲得 1 件物資', '選擇 1 件物資', '前進 2 格並觸發新格',
-    '解除禁閉', '可能失去 1 件物資', '下回合停一次', '退後 2 格', '安全通過'];
+    '下回合停一次', '可能失去 1 件物資', '下回合停一次', '退後 2 格', '退後 2 格'];
 
   function start(names) {
     if (names.length < 2 || names.length > 11) throw new RangeError('玩家人數須為 2–11');
@@ -68,7 +68,7 @@
   }
 
   function offerRegularTrade(state, player) {
-    if (surplus(player, 2).length) state.phase = 'trade';
+    if (surplus(player, 3).length) state.phase = 'trade';
     else finish(state);
   }
 
@@ -119,7 +119,7 @@
           resolveLanding(state, player, random, depth + 1);
           return;
         case 3:
-          player.jailed = false;
+          player.jailed = true;
           break;
         case 4: {
           const owned = [0, 1, 2].filter(i => player.materials[i]);
@@ -137,6 +137,7 @@
           player.jailed = true;
           break;
         case 6:
+        case 7:
           move(state, player, -2);
           break;
       }
@@ -318,9 +319,9 @@
         break;
       case 'trade': {
         if (phase !== 'trade' && phase !== 'station') return previous;
-        const cost = phase === 'trade' ? 2 : 1;
+        const cost = phase === 'trade' ? 3 : 1;
         if (action.from !== undefined) {
-          if (!surplus(player, 2).includes(action.from) || !whole(index, 0, 2) || action.from === index) return previous;
+          if (!surplus(player, phase === 'trade' ? 3 : 2).includes(action.from) || !whole(index, 0, 2) || action.from === index) return previous;
           player.materials[action.from] -= cost;
           gainMaterial(state, player, index, false);
           record(state, player, cost + ' ' + materials[action.from][0] + ' → 1 ' + materials[index][0]);
