@@ -1,0 +1,32 @@
+{
+  "$room": {
+    ".read": "auth != null && data.child('claim/uid').val() === auth.uid && now < data.child('createdAt').val() + 43200000",
+    ".write": "auth != null && $room.matches(/^[a-f0-9]{32}$/) && ((!data.exists() && newData.child('creator').val() === auth.uid && !newData.child('claim').exists() && !newData.child('private').exists() && newData.child('public/claimed').val() === false && newData.child('public/revision').val() === 0 && newData.child('public/payload').val() === 'null') || (data.child('claim/uid').val() === auth.uid && now < data.child('createdAt').val() + 43200000 && newData.child('creator').val() === data.child('creator').val() && newData.child('key').val() === data.child('key').val() && newData.child('createdAt').val() === data.child('createdAt').val() && newData.child('claim/uid').val() === data.child('claim/uid').val() && newData.child('claim/proof').val() === data.child('claim/proof').val() && newData.child('public/claimed').val() === true && newData.child('private/revision').val() === data.child('public/revision').val() + 1 && newData.child('public/revision').val() === newData.child('private/revision').val()))",
+    ".validate": "newData.hasChildren(['creator','key','createdAt','public'])",
+    "creator": { ".validate": "newData.isString()" },
+    "key": { ".validate": "newData.isString() && newData.val().matches(/^[a-f0-9]{32}$/)" },
+    "createdAt": { ".validate": "newData.isNumber() && newData.val() <= now && (data.exists() || newData.val() >= now - 10000)" },
+    "claim": {
+      ".write": "auth != null && !data.exists() && data.parent().child('key').exists() && now < data.parent().child('createdAt').val() + 600000 && newData.child('uid').val() === auth.uid && newData.child('proof').val() === data.parent().child('key').val()",
+      ".validate": "newData.hasChildren(['uid','proof'])",
+      "uid": { ".validate": "newData.isString()" },
+      "proof": { ".validate": "newData.isString() && newData.val() === newData.parent().parent().child('key').val()" },
+      "$other": { ".validate": false }
+    },
+    "private": {
+      ".validate": "newData.hasChildren(['revision','payload'])",
+      "revision": { ".validate": "newData.isNumber() && newData.val() >= 1 && newData.val() % 1 === 0" },
+      "payload": { ".validate": "newData.isString() && newData.val().length <= 500000" },
+      "$other": { ".validate": false }
+    },
+    "public": {
+      ".read": "data.exists() && now < data.parent().child('createdAt').val() + 43200000",
+      ".validate": "newData.hasChildren(['claimed','revision','payload'])",
+      "claimed": { ".validate": "newData.isBoolean()" },
+      "revision": { ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() % 1 === 0" },
+      "payload": { ".validate": "newData.isString() && newData.val().length <= 100000" },
+      "$other": { ".validate": false }
+    },
+    "$other": { ".validate": false }
+  }
+}
