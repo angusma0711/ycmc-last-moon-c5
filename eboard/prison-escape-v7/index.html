@@ -11,14 +11,14 @@
   <script defer src="firebase-config.js"></script>
   <script defer src="firebase-session.js"></script>
   <script defer src="session.js"></script>
-  <script defer src="app.js?v=fullscreen"></script>
+  <script defer src="app.js?v=fullscreen-hide"></script>
 </head>
 <body>
   <header class="topbar">
     <div class="brand"><span aria-hidden="true">⚿</span><h1>監獄風雲 <small>逃獄大作戰</small></h1></div>
     <nav id="tools" aria-label="主持工具"></nav>
   </header>
-  <button id="fullscreen" type="button" hidden>
+  <button id="fullscreen" type="button" aria-label="全螢幕" title="全螢幕" hidden>
     <span aria-hidden="true">⛶</span>
   </button>
   <p id="fullscreen-status" class="connection" role="status" hidden></p>
