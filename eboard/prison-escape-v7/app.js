@@ -198,10 +198,16 @@ function skillsLabel(i) {
 function turnCards(view) {
   const reveals = view.reveals ?? [];
   return reveals.length ? '<div class="turn-cards" aria-label="本回合卡牌">' + reveals.map(card => {
+    if (card.kind === 'material') {
+      const [title, symbol] = game.materials[card.index];
+      return '<article class="reveal-card resource-card">' + icon(symbol) +
+        '<div><small>獲得物資</small><strong>' + title + '</strong></div><b class="gain-quantity">＋1</b></article>';
+    }
     const event = card.kind === 'event';
     const image = event ? card.index : card.index + 8;
     const title = event ? game.events[card.index] : game.skills[card.index][0];
-    const caption = event ? '事件卡' : card.kind === 'draw' ? '抽到技能' : '技能發動';
+    const captions = { event: '事件卡', draw: '抽到技能', gainSkill: '獲得技能', skill: '技能發動' };
+    const caption = captions[card.kind];
     const detail = card.detail ?? (event ? game.eventEffects[card.index] : game.skills[card.index][2]);
     return '<article class="reveal-card ' + (event ? 'event-card' : 'skill-card') + '">' +
       '<div class="reveal-image" style="--x:' + (image % 4 * 100 / 3) + '%;--y:' +
@@ -239,28 +245,32 @@ function renderPanel(view) {
 }
 
 function renderInventory(view) {
-  $('inventory').hidden = !view || (!publicMode && setup);
+  $('inventory').hidden = publicMode || !view || setup;
   if ($('inventory').hidden) return;
   const current = view.players[selected];
-  const heading = publicMode ? '玩家進度' : '玩家物資';
-  const columns = [...game.materials, ...(!publicMode ? game.skills : [])];
-  $('inventory').innerHTML = '<div class="inventory-top"><h2>' + heading + '</h2>' +
-    (!publicMode ? '<div>' + button('紀錄', 'history') + button('修正', 'edit-open',
-      state.paused || !['roll', 'jail', 'next', 'roundEnd'].includes(state.phase) ? 'disabled' : '') + '</div>' : '') +
+  const columns = [...game.materials, ...game.skills];
+  $('inventory-body').innerHTML = '<div class="inventory-top">' + button('紀錄', 'history') + button('修正', 'edit-open',
+    state.paused || !['roll', 'jail', 'next', 'roundEnd'].includes(state.phase) ? 'disabled' : '') +
     '</div><div class="table-scroll"><table><thead><tr><th scope="col">玩家</th><th scope="col">格</th>' +
     columns.map(([label, symbol, hint]) => '<th scope="col" title="' + escapeHTML(hint ? label + ' · ' + hint : label) +
       '"><span class="sr-only">' + label + '</span>' + icon(symbol) + '</th>').join('') +
-    (!publicMode ? '<th scope="col" title="技能總數">技能</th>' : '') + '<th scope="col">👣 進度</th></tr></thead><tbody>' +
-    view.players.map(p => '<tr' + (!publicMode && current === p ? ' class="selected"' : '') +
-      '><th scope="row">' + (publicMode ? token(p) + ' ' + name(p) :
-        choice(token(p) + ' ' + name(p), 'select', p.id, 'row-select')) +
+    '<th scope="col" title="技能總數">技能</th><th scope="col">👣 進度</th></tr></thead><tbody>' +
+    view.players.map(p => '<tr' + (current === p ? ' class="selected"' : '') +
+      '><th scope="row">' + choice(token(p) + ' ' + name(p), 'select', p.id, 'row-select') +
       (p.jailed ? ' <span title="禁閉">🔒</span>' : '') + (p.place ? ' <span title="第 ' + p.place + ' 名">🏅</span>' : '') +
-      '</th><td>' + p.square + '</td>' + [...p.materials, ...(!publicMode ? p.skills : [])].map(quantity =>
+      '</th><td>' + p.square + '</td>' + [...p.materials, ...p.skills].map(quantity =>
         '<td class="' + (quantity ? 'quantity' : 'zero') + '">' + quantity + '</td>').join('') +
-      (!publicMode ? '<td>' + game.total(p.skills) + '/2</td>' : '') +
-      '<td><div class="progress"><progress aria-label="前進格數" max="20" value="' + Math.min(p.steps, 20) +
-      '"></progress><strong>' + p.steps + (p.steps >= 20 ? ' ✓' : '/20') + '</strong></div></td></tr>').join('') +
-    '</tbody></table></div>';
+      '<td>' + game.total(p.skills) + '/2</td><td><div class="progress"><progress aria-label="前進格數" max="20" value="' +
+      Math.min(p.steps, 20) + '"></progress><strong>' + p.steps + (p.steps >= 20 ? ' ✓' : '/20') +
+      '</strong></div></td></tr>').join('') + '</tbody></table></div>';
+}
+
+function fitPublicPanel() {
+  const panel = $('panel');
+  const art = panel.parentElement;
+  const padding = parseFloat(getComputedStyle(art).paddingTop) + parseFloat(getComputedStyle(art).paddingBottom);
+  const scale = Math.min(1, (art.clientHeight - padding - 4) / Math.max(panel.offsetHeight, 1));
+  panel.style.setProperty('--panel-scale', Math.max(0.1, scale));
 }
 
 function render() {
@@ -545,6 +555,7 @@ if (publicMode && roomId) {
         render();
         break;
       case 'select':
+        $('inventory').open = true;
         selected = Number(index);
         renderInventory(state);
         if (control.classList.contains('row-select')) {
@@ -605,3 +616,8 @@ if (publicMode && roomId) {
 }
 
 render();
+if (publicMode) {
+  const sizer = new ResizeObserver(fitPublicPanel);
+  sizer.observe($('panel'));
+  sizer.observe($('panel').parentElement);
+}

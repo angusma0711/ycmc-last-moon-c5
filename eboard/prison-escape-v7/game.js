@@ -72,9 +72,10 @@
     else finish(state);
   }
 
-  function gainMaterial(state, player, index) {
+  function gainMaterial(state, player, index, log = true) {
     player.materials[index]++;
-    record(state, player, '+1 ' + materials[index][0]);
+    reveal(state, 'material', index);
+    if (log) record(state, player, '+1 ' + materials[index][0]);
   }
 
   function move(state, player, distance) {
@@ -143,14 +144,15 @@
     if (tile === 'material') gainMaterial(state, player, pick([0, 1, 2], random));
     if (tile === 'skill') {
       const skill = pick([0, 1, 2, 3, 4], random);
-      reveal(state, 'draw', skill);
       if (total(player.skills) === 2) {
+        reveal(state, 'draw', skill);
         state.pending = skill;
         state.phase = 'replace';
         record(state, player, '抽到 ' + skills[skill][0] + ' · 技能已滿');
         return;
       }
       player.skills[skill]++;
+      reveal(state, 'gainSkill', skill);
       record(state, player, '+1 ' + skills[skill][0]);
     }
     if (tile === 'jail') {
@@ -307,6 +309,9 @@
           if (!whole(index, 0, 4) || !player.skills[index]) return previous;
           player.skills[index]--;
           player.skills[state.pending]++;
+          const draw = state.reveals?.at(-1);
+          if (draw?.kind === 'draw') draw.kind = 'gainSkill';
+          else reveal(state, 'gainSkill', state.pending);
           record(state, player, skills[index][0] + ' → ' + skills[state.pending][0]);
         }
         offerRegularTrade(state, player);
@@ -317,7 +322,7 @@
         if (action.from !== undefined) {
           if (!surplus(player, 2).includes(action.from) || !whole(index, 0, 2) || action.from === index) return previous;
           player.materials[action.from] -= cost;
-          player.materials[index]++;
+          gainMaterial(state, player, index, false);
           record(state, player, cost + ' ' + materials[action.from][0] + ' → 1 ' + materials[index][0]);
         }
         if (phase === 'station') offerRegularTrade(state, player);
