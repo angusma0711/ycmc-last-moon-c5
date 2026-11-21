@@ -5,13 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#e6faf7">
   <title>監獄風雲：逃獄大作戰 V7</title>
-  <link rel="stylesheet" href="style.css">
-  <script defer src="game.js"></script>
+  <link rel="stylesheet" href="style.css?v=projection">
+  <script defer src="game.js?v=projection"></script>
   <script defer src="vendor/qrcode.js"></script>
   <script defer src="firebase-config.js"></script>
   <script defer src="firebase-session.js"></script>
   <script defer src="session.js"></script>
-  <script defer src="app.js"></script>
+  <script defer src="app.js?v=projection"></script>
 </head>
 <body>
   <header class="topbar">
@@ -30,7 +30,10 @@
       </div>
       <div id="legend" class="legend"></div>
     </section>
-    <section id="inventory" class="inventory card" aria-label="玩家物資"></section>
+    <details id="inventory" class="inventory card" hidden>
+      <summary>玩家物資</summary>
+      <div id="inventory-body"></div>
+    </details>
   </main>
   <dialog id="dialog"></dialog>
 </body>

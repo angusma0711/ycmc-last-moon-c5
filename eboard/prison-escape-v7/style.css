@@ -329,3 +329,75 @@ dialog::backdrop { background: #050b11bc; }
   .turn-top { font-size: .76rem; }
   .goal { gap: .24rem; }
 }
+
+.inventory > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: .5rem;
+  font-size: 1.1rem;
+  font-weight: 800;
+}
+.inventory[open] > summary::after { content: '▴'; }
+.inventory-top { justify-content: flex-end; margin: .55rem 0; }
+.reveal-card.resource-card {
+  background: #fff2cd;
+  border-color: #a16e21;
+  box-shadow: 0 2px #a16e2160;
+}
+.resource-card > .image-icon {
+  width: clamp(2.35rem, 10cqw, 4rem);
+  height: auto;
+  aspect-ratio: 1;
+}
+.gain-quantity {
+  margin-inline-start: auto;
+  color: #764e10;
+  font-size: clamp(.9rem, 3cqw, 1.25rem);
+}
+
+body.public {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+.public .topbar { flex-shrink: 0; padding-block: .35rem; }
+.public .layout {
+  flex: 1;
+  min-height: 0;
+  container-type: size;
+  display: grid;
+  align-items: center;
+  margin: .2rem auto .35rem;
+}
+.public .board-panel { width: min(100%, 900px, calc(100cqh - 2.9rem)); }
+.public .board {
+  aspect-ratio: 1;
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+}
+.public .board-art {
+  min-width: 0;
+  min-height: 0;
+  padding: clamp(1.3rem, 6cqw, 2.2rem) .18rem;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
+}
+.public .center-controls { transform: scale(var(--panel-scale, 1)); }
+.public .board-status { z-index: 1; gap: .18rem .35rem; }
+.public .goal { font-size: clamp(.62rem, 2.3cqw, 1.1rem); }
+.public .legend { margin-top: .36rem; gap: .12rem .55rem; padding-block: .18rem; font-size: clamp(.63rem, 1.8cqw, .82rem); }
+.public .tile-number { font-size: clamp(.55rem, 2.2cqw, 1.2rem); }
+.public .pawns .token { width: clamp(.55rem, 2.9cqw, 1.4rem); font-size: clamp(.42rem, 1.7cqw, .82rem); }
+.public .tile.crowded .token { width: auto; height: clamp(.48rem, 2.35cqw, 1.13rem); }
+.public .tile.crowded .pawns { gap: 0; }
+
+@media (max-height: 480px), (max-width: 480px) {
+  .public .center-controls .card { padding: .25rem .35rem; }
+  .public .turn-top, .public .turn-feed { margin-block: .18rem; }
+  .public .turn-cards { gap: .17rem; }
+  .public .reveal-card { gap: .18rem; padding: .16rem .22rem; }
+  .public .reveal-image, .public .resource-card > .image-icon { width: 1.65rem; }
+  .public .reveal-card strong { font-size: .85rem; }
+  .public .reveal-card span, .public .reveal-card small { font-size: .66rem; }
+}
