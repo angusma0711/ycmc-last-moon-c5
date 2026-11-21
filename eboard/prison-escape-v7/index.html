@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e6faf7">
+  <title>監獄風雲：逃獄大作戰 V7</title>
+  <link rel="stylesheet" href="style.css">
+  <script defer src="game.js"></script>
+  <script defer src="vendor/qrcode.js"></script>
+  <script defer src="firebase-config.js"></script>
+  <script defer src="firebase-session.js"></script>
+  <script defer src="session.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span aria-hidden="true">⚿</span><h1>監獄風雲 <small>逃獄大作戰</small></h1></div>
+    <nav id="tools" aria-label="主持工具"></nav>
+  </header>
+  <p id="connection" class="connection" role="status" hidden></p>
+  <main class="layout">
+    <section class="board-panel" aria-label="遊戲棋盤">
+      <div id="board" class="board">
+        <div class="board-art">
+          <div id="board-status" class="board-status"></div>
+          <div id="panel" class="center-controls" aria-label="回合操作"></div>
+        </div>
+        <div id="tiles"></div>
+      </div>
+      <div id="legend" class="legend"></div>
+    </section>
+    <section id="inventory" class="inventory card" aria-label="玩家物資"></section>
+  </main>
+  <dialog id="dialog"></dialog>
+</body>
+</html>
