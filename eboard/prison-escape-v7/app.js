@@ -269,8 +269,6 @@ function setupFullscreen() {
   const control = $('fullscreen');
   const root = document.documentElement;
   const enter = root.requestFullscreen || root.webkitRequestFullscreen;
-  if (!enter) return;
-
   function updateControl() {
     control.hidden = Boolean(document.fullscreenElement || document.webkitFullscreenElement);
   }
@@ -281,11 +279,15 @@ function setupFullscreen() {
     const status = $('fullscreen-status');
     status.hidden = true;
     try {
-      await enter.call(root);
+      if (enter) {
+        await enter.call(root);
+        return;
+      }
     } catch {
-      status.textContent = '瀏覽器未能切換全螢幕。';
-      status.hidden = false;
+      // The browser or an embedded preview can block fullscreen.
     }
+    status.textContent = '此瀏覽器未能切換全螢幕。請用電腦瀏覽器直接開啟大屏。';
+    status.hidden = false;
   });
 }
 
@@ -303,7 +305,7 @@ function render() {
   document.body.classList.toggle('remote-host', remoteHost);
   const screen = remoteHost ? cloud.url('board', hostId) : '?board';
   $('tools').innerHTML = publicMode || awaitingHost ? '' : '<a class="button" href="' + escapeHTML(screen) +
-    '" target="_blank" rel="noopener">▣　大屏</a>' +
+    '" target="_blank" rel="noopener"><span aria-hidden="true">▣</span>　開啟大屏</a>' +
     (!remoteHost ? button('⌗　手機主持', 'pair') : '') +
     (state && !setup ? button(state.paused ? '繼續' : '暫停', 'pause', state.phase === 'ended' ? 'disabled' : '') +
       button('↶　撤銷', 'undo', undo ? '' : 'disabled') + '<details><summary>更多</summary><div class="menu">' +
