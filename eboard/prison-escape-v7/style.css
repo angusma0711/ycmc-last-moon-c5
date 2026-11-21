@@ -289,7 +289,6 @@ dialog::backdrop { background: #050b11bc; }
 .checkbox { display: flex; align-items: center; margin: .55rem 0; }
 .checkbox input { width: 1.1rem; min-height: 1.1rem; }
 #edit-error:not(:empty) { margin-bottom: .45rem; color: #a33331; }
-.public #tools { display: none; }
 @media (max-width: 760px) {
   .pawns .token { width: clamp(.62rem, 2.4vw, 1.25rem); font-size: clamp(.45rem, 1.45vw, .67rem); }
 }
@@ -363,7 +362,24 @@ body.public {
   min-height: 0;
   overflow: hidden;
 }
-.public .topbar { flex-shrink: 0; padding-block: .35rem; }
+.public .topbar { display: none; }
+#fullscreen {
+  position: fixed;
+  inset: max(.38rem, env(safe-area-inset-top)) max(.4rem, env(safe-area-inset-right)) auto auto;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  min-height: 0;
+  padding: 0;
+  border-color: #417d85;
+  background: #fffcef;
+  color: #174b61;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+#fullscreen-status { padding-inline-end: 2.5rem; }
 .public .layout {
   flex: 1;
   min-height: 0;
@@ -400,4 +416,10 @@ body.public {
   .public .reveal-image, .public .resource-card > .image-icon { width: 1.65rem; }
   .public .reveal-card strong { font-size: .85rem; }
   .public .reveal-card span, .public .reveal-card small { font-size: .66rem; }
+}
+
+@media (max-aspect-ratio: 6/5) {
+  .public:has(#fullscreen:not([hidden])) .layout {
+    margin-top: calc(2.65rem + env(safe-area-inset-top));
+  }
 }

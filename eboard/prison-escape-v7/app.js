@@ -265,6 +265,39 @@ function renderInventory(view) {
       '</strong></div></td></tr>').join('') + '</tbody></table></div>';
 }
 
+function setupFullscreen() {
+  const control = $('fullscreen');
+  const root = document.documentElement;
+  const enter = root.requestFullscreen || root.webkitRequestFullscreen;
+  const exit = document.exitFullscreen || document.webkitExitFullscreen;
+  if (!enter || !exit) return;
+
+  const isFullscreen = () => Boolean(document.fullscreenElement || document.webkitFullscreenElement);
+  function updateControl() {
+    const active = isFullscreen();
+    const label = active ? '離開全螢幕' : '全螢幕';
+    control.setAttribute('aria-label', label);
+    control.setAttribute('aria-pressed', String(active));
+    control.title = label;
+    control.firstElementChild.textContent = active ? '↙' : '⛶';
+  }
+  control.hidden = false;
+  updateControl();
+  document.addEventListener('fullscreenchange', updateControl);
+  document.addEventListener('webkitfullscreenchange', updateControl);
+  control.addEventListener('click', async () => {
+    const status = $('fullscreen-status');
+    status.hidden = true;
+    try {
+      if (isFullscreen()) await exit.call(document);
+      else await enter.call(root);
+    } catch {
+      status.textContent = '瀏覽器未能切換全螢幕。';
+      status.hidden = false;
+    }
+  });
+}
+
 function fitPublicPanel() {
   const panel = $('panel');
   const art = panel.parentElement;
@@ -617,6 +650,7 @@ if (publicMode && roomId) {
 
 render();
 if (publicMode) {
+  setupFullscreen();
   const sizer = new ResizeObserver(fitPublicPanel);
   sizer.observe($('panel'));
   sizer.observe($('panel').parentElement);
