@@ -367,19 +367,27 @@ body.public {
   position: fixed;
   inset: max(.38rem, env(safe-area-inset-top)) max(.4rem, env(safe-area-inset-right)) auto auto;
   z-index: 5;
-  display: grid;
-  place-items: center;
-  width: 2.3rem;
-  height: 2.3rem;
-  min-height: 0;
-  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: .36rem;
+  min-height: 2.3rem;
+  padding: .2rem .62rem;
   border-color: #417d85;
   background: #fffcef;
   color: #174b61;
-  font-size: 1.45rem;
-  line-height: 1;
+  font-weight: 750;
+  line-height: 1.2;
 }
-#fullscreen-status { padding-inline-end: 2.5rem; }
+#fullscreen span { font-size: 1.25em; }
+#fullscreen-status {
+  margin: .38rem auto 0;
+  padding: .45rem .5rem;
+  width: fit-content;
+  max-width: calc(100% - 7.5rem);
+  margin-inline-end: 7.1rem;
+  border-radius: 8px;
+  background: #fffcef;
+}
 .public .layout {
   flex: 1;
   min-height: 0;
@@ -418,7 +426,7 @@ body.public {
   .public .reveal-card span, .public .reveal-card small { font-size: .66rem; }
 }
 
-@media (max-aspect-ratio: 6/5) {
+@media (max-aspect-ratio: 7/5) {
   .public:has(#fullscreen:not([hidden])) .layout {
     margin-top: calc(2.65rem + env(safe-area-inset-top));
   }
